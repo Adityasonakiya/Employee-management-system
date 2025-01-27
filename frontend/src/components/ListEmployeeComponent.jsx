@@ -1,53 +1,57 @@
-import React from 'react'
-
-const Dummydata = [
-    {
-        id:1,
-        FirstName:"Aditya",
-        LastName:"Sonakiya",
-        email:"aditya@gmail.com"
-    },
-    {
-        id:2,
-        FirstName:"Ayush",
-        LastName:"Sonakiya",
-        email:"ayush@gmail.com"
-    },
-    {
-        id:3,
-        FirstName:"Ansh",
-        LastName:"Sonakiya",
-        email:"ansh@gmail.com"
-    }
-]
+import React, { useEffect, useState } from 'react'
+import { listEmployees } from '../services/EmployeeService';
+import { useNavigate } from 'react-router-dom';
 
 const ListEmployeeComponent = () => {
-  return (<>
-    <h1>List Of Employees</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Employee Id</th>
-                <th>Employee First Name</th>
-                <th>Employee Last Name</th>
-                <th>Employee Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                Dummydata.map(employee => 
-                    <tr key={employee.id}>
-                        <td>{employee.id}</td>
-                        <td>{employee.FirstName}</td>
-                        <td>{employee.LastName}</td>
-                        <td>{employee.email}</td>
-                    </tr>
-                )
-            }
-        </tbody>
-    </table>
+    const [employees, setEmployees] = useState([]);
+    const navigator = useNavigate();
+
+    useEffect(() => {
+        listEmployees().then((response) => {
+            setEmployees(response.data);
+        }).catch(error => {
+            console.error(error);
+        })
+    }, [])
+
+    function addNewEmployee() {
+        navigator('add-employee');
+    }
+
+    function updateEmployee(id) {
+        navigator(`edit-employee/${id}`)
+    }
+
+    return (<>
+        <h1>List Of Employees</h1>
+        <button onClick={addNewEmployee}>Add Employee</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email-Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    employees.map(employee =>
+                        <tr key={employee.id}>
+                            <td>{employee.id}</td>
+                            <td>{employee.firstName}</td>
+                            <td>{employee.lastName}</td>
+                            <td>{employee.email}</td>
+                            <td>
+                                <button onClick={() => updateEmployee(employee.id)}>Update</button>
+                            </td>
+                        </tr>
+                    )
+                }
+            </tbody>
+        </table>
     </>
-  )
+    )
 }
 
 export default ListEmployeeComponent
